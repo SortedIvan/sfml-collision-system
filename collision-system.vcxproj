@@ -22,8 +22,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{b347f4d5-73df-43b6-9bad-f836babefde4}</ProjectGuid>
-    <RootNamespace>sfmlcollisionsystem</RootNamespace>
+    <ProjectGuid>{a40ccf10-02a8-413d-bbac-961011b99445}</ProjectGuid>
+    <RootNamespace>collisionsystem</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
