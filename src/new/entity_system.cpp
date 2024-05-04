@@ -43,3 +43,12 @@ ShapeComponent& EntitySystem::addShapeComponent(EcsDb& db, uint64_t entityID)
     component.isActive = true;
     return component;
 }
+
+ClickableComponent& EntitySystem::addClickableComponent(EcsDb& db, uint64_t entityID)
+{
+    db.clickableComponents.emplace_back();
+    ClickableComponent& component = db.clickableComponents.back();
+    component.entity_id = entityID;
+    component.isActive = true;
+    return component;
+}

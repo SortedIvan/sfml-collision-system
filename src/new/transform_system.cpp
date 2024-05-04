@@ -9,9 +9,6 @@ void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime)
 		{
             // apply all movement here
            // Record the old position
-
-            std::cout << transform.position.x << " , " << transform.position.y << std::endl;
-            
             transform.previousPosition = transform.position;
 
             // Update the acceleration

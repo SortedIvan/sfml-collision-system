@@ -7,4 +7,5 @@ class EntitySystem
         TransformComponent& addTransformComponent(EcsDb& db, uint64_t entityID);
         ColliderComponent& addColliderComponent(EcsDb& db, uint64_t entityID);
         ShapeComponent& addShapeComponent(EcsDb& db, uint64_t entityID);
+        ClickableComponent& addClickableComponent(EcsDb& db, uint64_t entityID);
 };

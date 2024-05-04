@@ -45,4 +45,5 @@ struct ClickableComponent
 {
     bool wasClicked = false;
     uint64_t entity_id;
+    bool isActive;
 };

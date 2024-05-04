@@ -33,6 +33,9 @@
     <ClCompile Include="src\new\ecs_db.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\new\click_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\new\components.hpp">
@@ -51,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\new\transform_system.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\new\click_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

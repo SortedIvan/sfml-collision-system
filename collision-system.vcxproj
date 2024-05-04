@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\new\click_system.cpp" />
     <ClCompile Include="src\new\collision_system.cpp" />
     <ClCompile Include="src\new\ecs_db.cpp" />
     <ClCompile Include="src\new\entity_system.cpp" />
@@ -147,6 +148,7 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\new\click_system.hpp" />
     <ClInclude Include="src\new\components.hpp" />
     <ClInclude Include="src\new\ecs_db.hpp" />
     <ClInclude Include="src\new\collision_system.hpp" />
