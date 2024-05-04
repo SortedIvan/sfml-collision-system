@@ -1,5 +1,22 @@
 #include "click_system.hpp"
 #include <iostream>
+#include <random>
+
+const double PI = 3.1415926;
+
+sf::Vector2f createRandomDirectionVector()
+{
+	std::random_device dev;
+	std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> dist6(0, 360);
+
+	return sf::Vector2f(std::cos(dist6(rng)) * (PI / 180), std::sin(dist6(rng)) * (PI / 180));
+}
+
+float vectorLength(const sf::Vector2f vec)
+{
+	return std::sqrt(vec.x * vec.x + vec.y * vec.y);
+}
 
 void ClickSystem::processClick(EcsDb& db, sf::Vector2f positionClicked)
 {
@@ -49,8 +66,12 @@ void ClickSystem::processClick(EcsDb& db, sf::Vector2f positionClicked)
 
 			if (shapeClicked)
 			{
-				// perform click action here
-				std::cout << "Clicked";
+				TransformComponent* transform = findTransformComponent(db, click.entity_id);
+
+				if (transform)
+				{
+					transform->velocity = createRandomDirectionVector() * 30.f;
+				}
 			}
 		}
 	}

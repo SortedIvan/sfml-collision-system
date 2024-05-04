@@ -8,7 +8,7 @@ void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime)
 		if (transform.isActive)
 		{
             // apply all movement here
-           // Record the old position
+           // Record the old position76
             transform.previousPosition = transform.position;
 
             // Update the acceleration

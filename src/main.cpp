@@ -29,7 +29,7 @@ int main()
     ClickSystem clickSystem;
     
 
-    // add entity
+    // add an entity and its different components
     uint64_t entity = entitySystem.createEntity(ecsDb);
     ShapeComponent& shape = entitySystem.addShapeComponent(ecsDb, entity);
     TransformComponent& transform = entitySystem.addTransformComponent(ecsDb, entity);
@@ -49,7 +49,7 @@ int main()
     shape.shape[3].color = sf::Color::Blue;
 
     transform.position = sf::Vector2f(150.f, 150.f);
-    transform.dampingFactor = 0.4f;
+    transform.dampingFactor = 0.02f;
     transform.velocity = sf::Vector2f(1,1);
     transform.acceleration = 1.f;
    
