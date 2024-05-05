@@ -4,7 +4,8 @@
 #include <stack>
 
 
-enum ColliderType {
+enum ColliderType 
+{
     BoxCollider,
     TriangleCollider,
     CircleCollider,
@@ -12,7 +13,8 @@ enum ColliderType {
 };
 
 // ========== Collision =================
-struct ColliderComponent {
+struct ColliderComponent 
+{
     sf::VertexArray colliderBounds;
     ColliderType colliderType;
     uint64_t entity_id;

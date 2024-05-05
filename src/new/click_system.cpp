@@ -70,7 +70,7 @@ void ClickSystem::processClick(EcsDb& db, sf::Vector2f positionClicked)
 
 				if (transform)
 				{
-					transform->velocity = createRandomDirectionVector() * 30.f;
+					transform->velocity = createRandomDirectionVector() * 100.f;
 				}
 			}
 		}

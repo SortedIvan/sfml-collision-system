@@ -7,17 +7,13 @@ void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime)
 	{
 		if (transform.isActive)
 		{
-            // apply all movement here
-           // Record the old position76
+           // Record the old position
             transform.previousPosition = transform.position;
 
-            // Update the acceleration
             transform.acceleration *= transform.dampingFactor;
 
-            // Update the velocity with the now updated accel
             transform.velocity += transform.acceleration * sf::Vector2f(1.f, 1.f) * deltaTime;
 
-            // finally, add the velocity to the position
             transform.position = transform.position + transform.velocity;
 
             // check if the component had a shape component that we need to update
