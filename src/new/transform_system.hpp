@@ -6,5 +6,5 @@
 class TransformSystem
 {
 	public:
-		void moveAllComponents(EcsDb& db, float deltaTime);
+		void moveAllComponents(EcsDb& db, float deltaTime, float screenWidth, float screenHeight);
 };

@@ -9,8 +9,9 @@
 #include "../src/new/click_system.hpp"
 
 sf::Vector2f randomPointGenerator(sf::Vector2f range);
+sf::Vector2f randomVelocityGenerator(int scalar);
 void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vector2f windowDimensions);
-
+void TryLoadFont(sf::Font& font, std::string path);
 
 int main()
 {
@@ -18,12 +19,22 @@ int main()
     sf::RenderWindow window(
         sf::VideoMode(1000, 800),
         "Shapes");
-
     window.setFramerateLimit(60); // Set the framerate limit to 60 FPS
-
     sf::Event e;
 
+    sf::Font font;
+    TryLoadFont(font, "testfont.ttf");
+
     sf::Clock deltaTimeClock;
+    sf::Clock fpsClock;
+    sf::Time elapsed;
+    unsigned int frames = 0;
+
+    sf::Text fpsCounter;
+    fpsCounter.setFont(font);
+    fpsCounter.setPosition(50.f, 50.f);
+    fpsCounter.setCharacterSize(20.f);
+
 
     EcsDb ecsDb;
 
@@ -33,7 +44,7 @@ int main()
     ShapeSystem shapeSystem;
     ClickSystem clickSystem;
     
-    spawnRandomEntities(30, ecsDb, entitySystem, (sf::Vector2f)window.getSize());
+    spawnRandomEntities(100, ecsDb, entitySystem, (sf::Vector2f)window.getSize());
    
     // Main loop
     while (window.isOpen())
@@ -58,7 +69,7 @@ int main()
         sf::Time deltaTime = deltaTimeClock.restart();
         
         // ========== Update ==============
-        transformSystem.moveAllComponents(ecsDb, deltaTime.asSeconds());
+        transformSystem.moveAllComponents(ecsDb, deltaTime.asSeconds(), 1000, 800);
         shapeSystem.moveShapesIfNeeded(ecsDb);
 
         // Clear the window
@@ -66,13 +77,34 @@ int main()
         
         // draw
         shapeSystem.drawShapes(ecsDb, window);
+        window.draw(fpsCounter);
 
         // display
         window.display();
+
+        // Calculate FPS
+        frames++;
+        elapsed += fpsClock.restart();
+        if (elapsed >= sf::seconds(1.0f)) 
+        {
+            fpsCounter.setString("FPS: " + std::to_string(frames));
+            frames = 0;
+            elapsed = sf::Time::Zero;
+        }
     }
 
     return 0;
 }
+
+void TryLoadFont(sf::Font& font, std::string path)
+{
+    if (!font.loadFromFile(path))
+    {
+        std::cout << "Error loading the font file" << std::endl;
+        system("pause");
+    }
+}
+
 
 sf::Vector2f randomPointGenerator(sf::Vector2f range)
 {
@@ -85,11 +117,23 @@ sf::Vector2f randomPointGenerator(sf::Vector2f range)
     return sf::Vector2f(randX(rng), randY(rng));
 }
 
+sf::Vector2f randomVelocityGenerator(int scalar)
+{
+    const double PI = 3.1415926;
+
+    std::random_device dev;
+    std::mt19937 rng(dev());
+
+    std::uniform_int_distribution<std::mt19937::result_type> dist6(0, 360);
+    return sf::Vector2f(std::cos(dist6(rng)) * (PI / 180) * scalar, std::sin(dist6(rng)) * (PI / 180) * scalar);
+}
+
+
 void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vector2f windowDimensions)
 {
 
-    int widthRect = 100.f;
-    int heightRect = 100.f;
+    int widthRect = 20.f;
+    int heightRect = 20.f;
 
     for (int i = 0; i < amount; i++)
     {
@@ -116,7 +160,7 @@ void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vec
 
         transform.position = point;
         transform.dampingFactor = 0.02f;
-        transform.velocity = sf::Vector2f(1, 1);
+        transform.velocity = randomVelocityGenerator(50.f);
         transform.acceleration = 1.f;
     }
 }

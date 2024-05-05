@@ -1,14 +1,24 @@
 #include "shape_system.hpp"
+#include <thread>
+#include <mutex>
 
 void ShapeSystem::drawShapes(EcsDb& db, sf::RenderWindow& window)
 {
+    sf::VertexArray batchVertexArray(sf::Quads);
+
     for (auto& shape : db.shapeComponents)
     {
         if (shape.isActive)
         {
-            window.draw(shape.shape);
+            for (int i = 0; i < shape.shape.getVertexCount(); i++)
+            {
+                batchVertexArray.append(shape.shape[i]);
+            }
         }
     }
+
+    // Draw the batched entities in a single draw call
+    window.draw(batchVertexArray);
 }
 
 void ShapeSystem::moveShapesIfNeeded(EcsDb& db)

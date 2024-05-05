@@ -2,6 +2,9 @@
 #include <iostream>
 #include <random>
 
+
+// TODO: Move all of this crap to be in utility libraries
+
 const double PI = 3.1415926;
 
 sf::Vector2f createRandomDirectionVector()
@@ -16,6 +19,22 @@ sf::Vector2f createRandomDirectionVector()
 float vectorLength(const sf::Vector2f vec)
 {
 	return std::sqrt(vec.x * vec.x + vec.y * vec.y);
+}
+
+sf::Color getRandomColor()
+{
+	// Create a random number generator
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int> dis(0, 255); // Generate random numbers between 0 and 255
+
+	// Generate random values for red, green, and blue components
+	sf::Uint8 red = dis(gen);
+	sf::Uint8 green = dis(gen);
+	sf::Uint8 blue = dis(gen);
+
+	// Return the random color
+	return sf::Color(red, green, blue);
 }
 
 void ClickSystem::processClick(EcsDb& db, sf::Vector2f positionClicked)
@@ -67,6 +86,13 @@ void ClickSystem::processClick(EcsDb& db, sf::Vector2f positionClicked)
 			if (shapeClicked)
 			{
 				TransformComponent* transform = findTransformComponent(db, click.entity_id);
+
+				sf::Color randColor = getRandomColor();
+
+				for (int i = 0; i < shape->shape.getVertexCount(); i++)
+				{
+					shape->shape[i].color = randColor;
+				}
 
 				if (transform)
 				{

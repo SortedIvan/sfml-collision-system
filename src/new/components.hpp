@@ -49,3 +49,9 @@ struct ClickableComponent
     uint64_t entity_id;
     bool isActive;
 };
+
+struct FollowMousePosComponent
+{
+    uint64_t entity_id;
+    bool isActive;
+};

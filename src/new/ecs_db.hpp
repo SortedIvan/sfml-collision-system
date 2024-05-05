@@ -13,6 +13,7 @@ struct EcsDb
 	std::vector<ShapeComponent> shapeComponents;
 	std::vector<ColliderComponent> colliderComponents;
 	std::vector<ClickableComponent> clickableComponents;
+	std::vector<FollowMousePosComponent> followMouseComponents;
 
 	// ============== Entities ========================
 	std::vector<uint64_t> entities;
