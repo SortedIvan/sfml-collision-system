@@ -143,6 +143,8 @@
     <ClCompile Include="src\new\collision_system.cpp" />
     <ClCompile Include="src\new\ecs_db.cpp" />
     <ClCompile Include="src\new\entity_system.cpp" />
+    <ClCompile Include="src\new\follow_system.cpp" />
+    <ClCompile Include="src\new\scatter_system.cpp" />
     <ClCompile Include="src\new\shape_system.cpp" />
     <ClCompile Include="src\new\transform_system.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -153,6 +155,9 @@
     <ClInclude Include="src\new\ecs_db.hpp" />
     <ClInclude Include="src\new\collision_system.hpp" />
     <ClInclude Include="src\new\entity_system.hpp" />
+    <ClInclude Include="src\new\follow_system.hpp" />
+    <ClInclude Include="src\new\math.hpp" />
+    <ClInclude Include="src\new\scatter_system.hpp" />
     <ClInclude Include="src\new\shape_system.hpp" />
     <ClInclude Include="src\new\transform_system.hpp" />
   </ItemGroup>

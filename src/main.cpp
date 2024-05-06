@@ -7,6 +7,8 @@
 #include "../src/new/transform_system.hpp"
 #include "../src/new/entity_system.hpp"
 #include "../src/new/click_system.hpp"
+#include "../src/new/follow_system.hpp"
+#include "../src/new/scatter_system.hpp"
 
 sf::Vector2f randomPointGenerator(sf::Vector2f range);
 sf::Vector2f randomVelocityGenerator(int scalar);
@@ -35,6 +37,8 @@ int main()
     fpsCounter.setPosition(50.f, 50.f);
     fpsCounter.setCharacterSize(20.f);
 
+    sf::Shader shader;
+
 
     EcsDb ecsDb;
 
@@ -43,6 +47,8 @@ int main()
     TransformSystem transformSystem;
     ShapeSystem shapeSystem;
     ClickSystem clickSystem;
+    FollowSystem followSystem;
+    ScatterSystem scatterSystem;
     
     spawnRandomEntities(100, ecsDb, entitySystem, (sf::Vector2f)window.getSize());
    
@@ -59,9 +65,33 @@ int main()
 
             if (e.type == sf::Event::MouseButtonPressed)
             {
-                clickSystem.processClick(ecsDb, (sf::Vector2f)sf::Mouse::getPosition(window));
-                std::cout << "hi";
+                if (e.mouseButton.button == sf::Mouse::Left) 
+                {
+                    clickSystem.processClick(ecsDb, (sf::Vector2f)sf::Mouse::getPosition(window));
+                    std::cout << "hi";
+                }
+                else
+                {
+                    followSystem.activateFollow();
+                }
             }
+
+            if (e.type == sf::Event::KeyReleased)
+            {
+                if (e.key.code == sf::Keyboard::X)
+                {
+                    scatterSystem.scatterObjects((sf::Vector2f)sf::Mouse::getPosition(window), 50.f, ecsDb);
+                }
+            }
+
+            if (e.type == sf::Event::MouseMoved)
+            {
+                // Get the mouse position relative to the window
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                followSystem.setFollowTarget(ecsDb,(sf::Vector2f)mousePos);
+            }
+
         }
 
         // Get delta time and run all updates
@@ -129,6 +159,7 @@ sf::Vector2f randomVelocityGenerator(int scalar)
 }
 
 
+
 void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vector2f windowDimensions)
 {
 
@@ -142,7 +173,9 @@ void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vec
         ClickableComponent& click = entitySys.addClickableComponent(db, entity);
         ShapeComponent& shape = entitySys.addShapeComponent(db, entity);
         TransformComponent& transform = entitySys.addTransformComponent(db, entity);
-        
+        entitySys.addFollowMouseComponent(db, entity);
+
+
         shape.shape = sf::VertexArray(sf::Quads, 4);
 
         // Generate a random point within the screen

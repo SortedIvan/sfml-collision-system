@@ -52,3 +52,12 @@ ClickableComponent& EntitySystem::addClickableComponent(EcsDb& db, uint64_t enti
     component.isActive = true;
     return component;
 }
+
+FollowMousePosComponent& EntitySystem::addFollowMouseComponent(EcsDb& db, uint64_t entityID)
+{
+    db.followMouseComponents.emplace_back();
+    FollowMousePosComponent& component = db.followMouseComponents.back();
+    component.entity_id = entityID;
+    component.isActive = true;
+    return component;
+}

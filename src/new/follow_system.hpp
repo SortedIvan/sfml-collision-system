@@ -8,5 +8,5 @@ class FollowSystem
 		bool isActivated;
 	public:
 		void activateFollow();
-		void follow(EcsDb& db, sf::Vector2f mousePos);
+		void setFollowTarget(EcsDb& db, sf::Vector2f mousePos);
 };

@@ -16,11 +16,6 @@ sf::Vector2f createRandomDirectionVector()
 	return sf::Vector2f(std::cos(dist6(rng)) * (PI / 180), std::sin(dist6(rng)) * (PI / 180));
 }
 
-float vectorLength(const sf::Vector2f vec)
-{
-	return std::sqrt(vec.x * vec.x + vec.y * vec.y);
-}
-
 sf::Color getRandomColor()
 {
 	// Create a random number generator
