@@ -27,10 +27,11 @@ struct TransformComponent
     sf::Vector2f position;
     sf::Vector2f previousPosition;
     sf::Vector2f velocity;
+    sf::Vector2f acceleration;
     uint64_t entity_id;
-    float acceleration;
     float dampingFactor;
     bool isActive;
+    bool isMoving = false;
 };
 
 // ======== Shapes =======================

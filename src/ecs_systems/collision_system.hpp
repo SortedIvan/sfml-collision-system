@@ -1,6 +1,6 @@
 #pragma once
-#include "components.hpp"
-#include "ecs_db.hpp"
+#include "../ecs_components/components.hpp"
+#include "../ecs_db/ecs_db.hpp"
 
 class CollisionSystem 
 {

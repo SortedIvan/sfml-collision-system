@@ -1,4 +1,4 @@
-#include "collision_system.hpp"
+#include "../ecs_systems/collision_system.hpp"
 
 void CollisionSystem::handleCollisions(EcsDb& db) 
 {

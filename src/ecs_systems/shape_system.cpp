@@ -1,4 +1,4 @@
-#include "shape_system.hpp"
+#include "../ecs_systems/shape_system.hpp"
 #include <thread>
 #include <mutex>
 

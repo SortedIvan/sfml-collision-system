@@ -1,4 +1,4 @@
-#include "transform_system.hpp"
+#include "../ecs_systems/transform_system.hpp"
 #include <iostream>
 #include <random>
 
@@ -25,11 +25,34 @@ void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screen
     {
         if (transform.isActive)
         {
-            transform.previousPosition = transform.position;
-            transform.acceleration *= transform.dampingFactor;
-            transform.velocity += transform.acceleration * sf::Vector2f(1.f, 1.f) * deltaTime;
-            transform.position = transform.position + transform.velocity;
+            if (!transform.isMoving)
+            {
+                continue;
+            }
 
+            transform.previousPosition = transform.position;
+
+            // Update velocity based on acceleration
+            transform.velocity += transform.acceleration * deltaTime;
+
+            // Update position based on velocity
+            transform.position += transform.velocity * deltaTime;
+
+            // Apply damping to velocity
+            
+                transform.velocity.x -= transform.velocity.x * transform.dampingFactor * deltaTime;
+            transform.velocity.y -= transform.velocity.y * transform.dampingFactor * deltaTime;
+
+            if (std::abs(transform.velocity.x) < 6.f) {
+                transform.velocity.x = 0.0000f;
+                transform.isMoving = false;
+            }
+            if (std::abs(transform.velocity.y) < 6.f) {
+                transform.velocity.y = 0.0000f;
+                transform.isMoving = false;
+            }
+            
+         
             bool bounced = false;
 
             // Check for collision with screen boundaries

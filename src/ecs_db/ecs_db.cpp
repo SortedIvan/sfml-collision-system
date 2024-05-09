@@ -1,4 +1,4 @@
-#include "ecs_db.hpp"
+#include "../ecs_db/ecs_db.hpp"
 
 TransformComponent* findTransformComponent(EcsDb& db, uint64_t entity_id)
 {

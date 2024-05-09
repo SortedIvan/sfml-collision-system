@@ -1,4 +1,9 @@
-#include "scatter_system.hpp"
+#include "../ecs_systems/scatter_system.hpp"
+
+float len(const sf::Vector2f vec)
+{
+	return std::sqrt(vec.x * vec.x + vec.y * vec.y);
+}
 
 bool checkIfPointInCircle(sf::Vector2f circleCenter, float radius, sf::Vector2f point)
 {
@@ -13,6 +18,7 @@ bool checkIfPointInCircle(sf::Vector2f circleCenter, float radius, sf::Vector2f 
 	return false;
 }
 
+
 void ScatterSystem::scatterObjects(sf::Vector2f mousePos, float radius, EcsDb& db)
 {
 	/*
@@ -25,9 +31,11 @@ void ScatterSystem::scatterObjects(sf::Vector2f mousePos, float radius, EcsDb& d
 	{
 		if (checkIfPointInCircle(mousePos, radius, db.transformComponents[i].position))
 		{
-			db.transformComponents[i].velocity = sf::Vector2f(
-					-db.transformComponents[i].velocity.x,
-					-db.transformComponents[i].velocity.y);
+			sf::Vector2f newDir = db.transformComponents[i].position - mousePos;
+			float length = len(newDir);
+
+			db.transformComponents[i].velocity = sf::Vector2f((newDir.x / length) * 2500.f, (newDir.y / length) * 2500.f);
+			db.transformComponents[i].isMoving = true;
 		}
 	}
 }

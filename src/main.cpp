@@ -2,22 +2,24 @@
 #include "SFML/Graphics.hpp"
 #include <iostream>
 #include <random>
-#include "../src/new/collision_system.hpp"
-#include "../src/new/shape_system.hpp"
-#include "../src/new/transform_system.hpp"
-#include "../src/new/entity_system.hpp"
-#include "../src/new/click_system.hpp"
-#include "../src/new/follow_system.hpp"
-#include "../src/new/scatter_system.hpp"
+#include "ecs_systems/collision_system.hpp"
+#include "ecs_systems/shape_system.hpp"
+#include "ecs_systems/transform_system.hpp"
+#include "ecs_systems/entity_system.hpp"
+#include "ecs_systems/click_system.hpp"
+#include "ecs_systems/follow_system.hpp"
+#include "ecs_systems/scatter_system.hpp"
+#include "utils/quadtree.hpp"
 
 sf::Vector2f randomPointGenerator(sf::Vector2f range);
-sf::Vector2f randomVelocityGenerator(int scalar);
+void randomVelocityGenerator(std::vector<sf::Vector2f>& randomDirections, int scalar, int amountOfRects);
 void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vector2f windowDimensions);
 void TryLoadFont(sf::Font& font, std::string path);
+sf::Vector2f randomDirVec();
+
 
 int main()
 {
-
     sf::RenderWindow window(
         sf::VideoMode(1000, 800),
         "Shapes");
@@ -50,7 +52,20 @@ int main()
     FollowSystem followSystem;
     ScatterSystem scatterSystem;
     
-    spawnRandomEntities(100, ecsDb, entitySystem, (sf::Vector2f)window.getSize());
+
+    std::unique_ptr<QuadNode> root = std::make_unique<QuadNode>();
+    QuadRect boundary;
+    boundary.construct(0, 0, 1000, 800);
+    root.get()->boundary = boundary;
+
+    root.get()->insert(sf::Vector2f(100.f, 100.f));
+    root.get()->insert(sf::Vector2f(100.f, 200.f));
+    root.get()->insert(sf::Vector2f(200.f, 100.f));
+    root.get()->insert(sf::Vector2f(300.f, 100.f));
+
+    traverseQuadTree(root);
+
+    //spawnRandomEntities(300, ecsDb, entitySystem, (sf::Vector2f)window.getSize());
    
     // Main loop
     while (window.isOpen())
@@ -83,15 +98,6 @@ int main()
                     scatterSystem.scatterObjects((sf::Vector2f)sf::Mouse::getPosition(window), 50.f, ecsDb);
                 }
             }
-
-            if (e.type == sf::Event::MouseMoved)
-            {
-                // Get the mouse position relative to the window
-                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-
-                followSystem.setFollowTarget(ecsDb,(sf::Vector2f)mousePos);
-            }
-
         }
 
         // Get delta time and run all updates
@@ -99,8 +105,12 @@ int main()
         sf::Time deltaTime = deltaTimeClock.restart();
         
         // ========== Update ==============
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
         transformSystem.moveAllComponents(ecsDb, deltaTime.asSeconds(), 1000, 800);
         shapeSystem.moveShapesIfNeeded(ecsDb);
+        
+        followSystem.setFollowTarget(ecsDb, (sf::Vector2f)mousePos);
+
 
         // Clear the window
         window.clear(sf::Color::Black);
@@ -135,6 +145,16 @@ void TryLoadFont(sf::Font& font, std::string path)
     }
 }
 
+sf::Vector2f randomDirVec()
+{
+    const double PI = 3.1415926;
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist6(0, 360);
+
+    return sf::Vector2f(std::cos(dist6(rng)) * (PI / 180), std::sin(dist6(rng)) * (PI / 180));
+}
+
 
 sf::Vector2f randomPointGenerator(sf::Vector2f range)
 {
@@ -147,24 +167,14 @@ sf::Vector2f randomPointGenerator(sf::Vector2f range)
     return sf::Vector2f(randX(rng), randY(rng));
 }
 
-sf::Vector2f randomVelocityGenerator(int scalar)
-{
-    const double PI = 3.1415926;
-
-    std::random_device dev;
-    std::mt19937 rng(dev());
-
-    std::uniform_int_distribution<std::mt19937::result_type> dist6(0, 360);
-    return sf::Vector2f(std::cos(dist6(rng)) * (PI / 180) * scalar, std::sin(dist6(rng)) * (PI / 180) * scalar);
-}
-
-
-
 void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vector2f windowDimensions)
 {
 
     int widthRect = 20.f;
     int heightRect = 20.f;
+
+    //std::vector<sf::Vector2f> randomDirections;
+    //randomVelocityGenerator(randomDirections, 5.f, amount);
 
     for (int i = 0; i < amount; i++)
     {
@@ -174,7 +184,6 @@ void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vec
         ShapeComponent& shape = entitySys.addShapeComponent(db, entity);
         TransformComponent& transform = entitySys.addTransformComponent(db, entity);
         entitySys.addFollowMouseComponent(db, entity);
-
 
         shape.shape = sf::VertexArray(sf::Quads, 4);
 
@@ -192,9 +201,62 @@ void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vec
         shape.shape[3].color = sf::Color::Blue;
 
         transform.position = point;
-        transform.dampingFactor = 0.02f;
-        transform.velocity = randomVelocityGenerator(50.f);
-        transform.acceleration = 1.f;
+        transform.dampingFactor = 0.9f;
+        transform.velocity = randomDirVec() * 20000.f;
+        transform.acceleration = sf::Vector2f(3, 3);
+        transform.isMoving = true;
     }
 }
-
+//
+//int main()
+//{
+//    sf::RenderWindow window(
+//        sf::VideoMode(1000, 800),
+//        "Shapes");
+//    window.setFramerateLimit(60); // Set the framerate limit to 60 FPS
+//    sf::Event e;
+//
+//    sf::Font font;
+// 
+//
+//    // Main loop
+//    while (window.isOpen())
+//    {
+//
+//        while (window.pollEvent(e))
+//        {
+//            if (e.type == sf::Event::Closed)
+//            {
+//                window.close();
+//            }
+//
+//            if (e.type == sf::Event::MouseButtonPressed)
+//            {
+//                if (e.mouseButton.button == sf::Mouse::Left) 
+//                {
+//                }
+//
+//            }
+//
+//            if (e.type == sf::Event::KeyReleased)
+//            {
+//                if (e.key.code == sf::Keyboard::X)
+//                {
+//                  
+//                }
+//            }
+//        }
+//
+//        // Clear the window
+//        window.clear(sf::Color::Black);
+//        
+//        // draw
+//
+//        // display
+//        window.display();
+//
+//        // Calculate FPS
+//    }
+//
+//    return 0;
+//}

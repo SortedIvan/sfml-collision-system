@@ -18,60 +18,63 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\new\collision_system.cpp">
+    <ClCompile Include="src\ecs_db\ecs_db.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\new\entity_system.cpp">
+    <ClCompile Include="src\ecs_systems\click_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\new\shape_system.cpp">
+    <ClCompile Include="src\ecs_systems\collision_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\new\transform_system.cpp">
+    <ClCompile Include="src\ecs_systems\entity_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\new\ecs_db.cpp">
+    <ClCompile Include="src\ecs_systems\follow_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\new\click_system.cpp">
+    <ClCompile Include="src\ecs_systems\scatter_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\new\follow_system.cpp">
+    <ClCompile Include="src\ecs_systems\shape_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\new\scatter_system.cpp">
+    <ClCompile Include="src\ecs_systems\transform_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\new\components.hpp">
+    <ClInclude Include="src\ecs_components\components.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\new\ecs_db.hpp">
+    <ClInclude Include="src\ecs_db\ecs_db.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\new\collision_system.hpp">
+    <ClInclude Include="src\ecs_systems\click_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\new\entity_system.hpp">
+    <ClInclude Include="src\ecs_systems\collision_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\new\shape_system.hpp">
+    <ClInclude Include="src\ecs_systems\entity_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\new\transform_system.hpp">
+    <ClInclude Include="src\ecs_systems\follow_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\new\click_system.hpp">
+    <ClInclude Include="src\ecs_systems\scatter_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\new\follow_system.hpp">
+    <ClInclude Include="src\ecs_systems\shape_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\new\math.hpp">
+    <ClInclude Include="src\ecs_systems\transform_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\new\scatter_system.hpp">
+    <ClInclude Include="src\utils\math.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\quadtree.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

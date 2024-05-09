@@ -1,9 +1,14 @@
-#include "follow_system.hpp"
-#include "math.hpp"
+#include "../ecs_systems/follow_system.hpp"
+
 
 void FollowSystem::activateFollow()
 {
 	isActivated = !isActivated;
+}
+
+float vectorLength(const sf::Vector2f vec)
+{
+	return std::sqrt(vec.x * vec.x + vec.y * vec.y);
 }
 
 void FollowSystem::setFollowTarget(EcsDb& db, sf::Vector2f mousePos)
@@ -21,10 +26,12 @@ void FollowSystem::setFollowTarget(EcsDb& db, sf::Vector2f mousePos)
 		{
 			sf::Vector2f dirVector = mousePos - transform->position;
 
-			float dirLen = vectorLength(dirVector);
-			float velocityLen = vectorLength(transform->velocity);
-
-			transform->velocity = sf::Vector2f(dirVector.x / dirLen, dirVector.y / dirLen) * velocityLen;
+			transform->velocity = sf::Vector2f(dirVector.x, dirVector.y) * 10.f;
 		}
 	}
+}
+
+bool FollowSystem::getIsActivated()
+{
+	return isActivated;
 }

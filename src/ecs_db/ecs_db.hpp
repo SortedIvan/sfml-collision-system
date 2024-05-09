@@ -4,7 +4,7 @@
 */
 #pragma once
 #include <vector>
-#include "components.hpp"
+#include "../ecs_components/components.hpp"
 
 struct EcsDb
 {

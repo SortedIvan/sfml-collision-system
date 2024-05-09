@@ -1,4 +1,4 @@
-#include "entity_system.hpp"
+#include "../ecs_systems/entity_system.hpp"
 
 uint64_t EntitySystem::createEntity(EcsDb& db)
 {
