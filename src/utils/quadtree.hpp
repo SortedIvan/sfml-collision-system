@@ -28,6 +28,7 @@ struct QuadRect
     }
 };
 
+
 struct QuadNode
 {
     std::unique_ptr<QuadNode> TL;
@@ -49,22 +50,22 @@ struct QuadNode
         QuadRect BL_BOUNDS;
         QuadRect BR_BOUNDS;
 
-        TL_BOUNDS.construct(boundary.x, boundary.y, boundary.x + boundary.w / 2, boundary.y + boundary.h / 2);
-        TR_BOUNDS.construct(boundary.x + boundary.w / 2, boundary.y, boundary.x + boundary.w, boundary.y + boundary.h / 2);
-        BL_BOUNDS.construct(boundary.x, boundary.y + boundary.h / 2, boundary.x + boundary.w / 2, boundary.y + boundary.h);
-        BR_BOUNDS.construct(boundary.x + boundary.w / 2, boundary.y + boundary.h / 2, boundary.x + boundary.w, boundary.y + boundary.h);
-
+        TL_BOUNDS.construct(boundary.x, boundary.y, boundary.w / 2, boundary.h / 2);
+        TR_BOUNDS.construct(boundary.x + boundary.w / 2, boundary.y, boundary.w / 2, boundary.h / 2);
+        BL_BOUNDS.construct(boundary.x, boundary.y + boundary.h / 2, boundary.w / 2, boundary.h / 2);
+        BR_BOUNDS.construct(boundary.x + boundary.w / 2, boundary.y + boundary.h / 2, boundary.w / 2, boundary.h / 2);
+        
         TL = std::make_unique<QuadNode>();
-        TL.get()->boundary = TL_BOUNDS;
+        TL->boundary = TL_BOUNDS;
 
         TR = std::make_unique<QuadNode>();
-        TR.get()->boundary = TR_BOUNDS;
+        TR->boundary = TR_BOUNDS;
 
         BL = std::make_unique<QuadNode>();
-        BL.get()->boundary = BL_BOUNDS;
+        BL->boundary = BL_BOUNDS;
 
         BR = std::make_unique<QuadNode>();
-        BR.get()->boundary = BR_BOUNDS;
+        BR->boundary = BR_BOUNDS;
     }
 
     void insert(sf::Vector2f point)
@@ -75,24 +76,68 @@ struct QuadNode
             return;
         }
 
-        if (points.size() != nodeCapacity)
+        if (points.size() < nodeCapacity && !hasBeenSplit)
         {
+            // If the current node hasn't been split and still has capacity, add the point
             points.push_back(point);
         }
         else
         {
             if (!hasBeenSplit)
             {
+                // If the current node hasn't been split, split it first
                 split();
+
+                // Redistribute existing points to child nodes
+                for (const auto& p : points)
+                {
+                    TL->insert(p);
+                    TR->insert(p);
+                    BL->insert(p);
+                    BR->insert(p);
+                }
+                points.clear(); // Clear the points in the current node
             }
 
-            TL.get()->insert(point);
-            TR.get()->insert(point);
-            BL.get()->insert(point);
-            BR.get()->insert(point);
+            // Then insert the new point into the appropriate child node
+            TL->insert(point);
+            TR->insert(point);
+            BL->insert(point);
+            BR->insert(point);
         }
     }
 };
+
+void visualizeTree(std::unique_ptr<QuadNode>& root, sf::RenderWindow& window)
+{
+    if (!root)
+    {
+        return;
+    }
+
+    QuadRect bound = root.get()->boundary;
+
+    sf::RectangleShape rect(sf::Vector2f(bound.w, bound.h));
+    rect.setPosition(sf::Vector2f(bound.x, bound.y));
+    rect.setOutlineThickness(1.f);
+    rect.setFillColor(sf::Color::Transparent);
+    rect.setOutlineColor(sf::Color::White);
+
+    window.draw(rect);
+
+    for (int i = 0; i < root.get()->points.size(); ++i)
+    {
+        sf::CircleShape point(3.f);
+        point.setPosition(root.get()->points[i]);
+          
+        window.draw(point);
+    }
+
+    visualizeTree(root.get()->TL, window);
+    visualizeTree(root.get()->TR, window);
+    visualizeTree(root.get()->BL, window);
+    visualizeTree(root.get()->BR, window);
+}
 
 void traverseQuadTree(std::unique_ptr<QuadNode>& root)
 {
