@@ -9,7 +9,6 @@
 #include "ecs_systems/click_system.hpp"
 #include "ecs_systems/follow_system.hpp"
 #include "ecs_systems/scatter_system.hpp"
-#include "utils/quadtree.hpp"
 
 sf::Vector2f randomPointGenerator(sf::Vector2f range);
 void randomVelocityGenerator(std::vector<sf::Vector2f>& randomDirections, int scalar, int amountOfRects);
@@ -95,6 +94,11 @@ int main()
                 {
                     scatterSystem.scatterObjects((sf::Vector2f)sf::Mouse::getPosition(window), 50.f, ecsDb);
                 }
+
+                if (e.key.code == sf::Keyboard::A)
+                {
+                    addEntity(ecsDb, entitySystem, window, root);
+                }
             }
         }
 
@@ -104,7 +108,7 @@ int main()
         
         // ========== Update ==============
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        transformSystem.moveAllComponents(ecsDb, deltaTime.asSeconds(), 1000, 800);
+        transformSystem.moveAllComponents(ecsDb, deltaTime.asSeconds(), 1000, 800, root);
         shapeSystem.moveShapesIfNeeded(ecsDb);
         
         followSystem.setFollowTarget(ecsDb, (sf::Vector2f)mousePos);
@@ -140,7 +144,11 @@ void insertAllRectsIntoQuadTreeTest(std::unique_ptr<QuadNode>& root, EcsDb& db)
 {
     for (int i = 0; i < db.transformComponents.size(); i++)
     {
-        root.get()->insert(db.transformComponents[i].position);
+        QuadLeaf leaf;
+        leaf.position = db.transformComponents[i].position;
+        leaf.transformId = db.transformComponents[i].transform_id;
+
+        root.get()->insert(leaf);
     }
 }
 
@@ -206,7 +214,11 @@ void addEntity(EcsDb& db, EntitySystem& entitySys, sf::RenderWindow& window, std
     transform.acceleration = sf::Vector2f(3, 3);
     transform.isMoving = true;
 
-    root.get()->insert(positionClicked);
+    QuadLeaf leaf; 
+    leaf.position = transform.position;
+    leaf.transformId = transform.transform_id;
+
+    root.get()->insert(leaf);
 }
 
 void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vector2f windowDimensions)

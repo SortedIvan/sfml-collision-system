@@ -19,7 +19,7 @@ sf::Color genRandomColor()
 }
 
 
-void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screenWidth, float screenHeight)
+void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screenWidth, float screenHeight, std::unique_ptr<QuadNode>& root)
 {
     for (auto& transform : db.transformComponents)
     {
