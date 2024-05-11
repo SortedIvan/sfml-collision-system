@@ -18,7 +18,6 @@ sf::Color genRandomColor()
     return sf::Color(red, green, blue);
 }
 
-
 void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screenWidth, float screenHeight, std::unique_ptr<QuadNode>& root)
 {
     for (auto& transform : db.transformComponents)
@@ -37,17 +36,44 @@ void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screen
 
             // Update position based on velocity
             transform.position += transform.velocity * deltaTime;
+            
+            /*
+                Use the previousPosition to query the tree.
+                Then, use the newPosition to update the point
+            */
+
+            if (root->TL)
+            {
+                root->TL->update(transform.previousPosition, transform.position, transform.transform_id, root);
+            }
+
+            if (root->TR)
+            {
+                root->TR->update(transform.previousPosition, transform.position, transform.transform_id, root);
+            }
+
+            if (root->BL)
+            {
+                root->BL->update(transform.previousPosition, transform.position, transform.transform_id, root);
+            }
+
+            if (root->BR)
+            {
+                root->BR->update(transform.previousPosition, transform.position, transform.transform_id, root);
+            }
+
 
             // Apply damping to velocity
-            
-                transform.velocity.x -= transform.velocity.x * transform.dampingFactor * deltaTime;
+            transform.velocity.x -= transform.velocity.x * transform.dampingFactor * deltaTime;
             transform.velocity.y -= transform.velocity.y * transform.dampingFactor * deltaTime;
 
-            if (std::abs(transform.velocity.x) < 6.f) {
+            if (std::abs(transform.velocity.x) < 6.f) 
+            {
                 transform.velocity.x = 0.0000f;
                 transform.isMoving = false;
             }
-            if (std::abs(transform.velocity.y) < 6.f) {
+            if (std::abs(transform.velocity.y) < 6.f) 
+            {
                 transform.velocity.y = 0.0000f;
                 transform.isMoving = false;
             }
@@ -61,7 +87,8 @@ void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screen
                 transform.velocity.x *= -1;
                 bounced = true;
             }
-            else if (transform.position.x > screenWidth) {
+            else if (transform.position.x > screenWidth) 
+            {
                 transform.position.x = screenWidth;
                 transform.velocity.x *= -1;
                 bounced = true;
@@ -72,7 +99,8 @@ void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screen
                 transform.velocity.y *= -1;
                 bounced = true;
             }
-            else if (transform.position.y > screenHeight) {
+            else if (transform.position.y > screenHeight) 
+            {
                 transform.position.y = screenHeight;
                 transform.velocity.y *= -1;
                 bounced = true;

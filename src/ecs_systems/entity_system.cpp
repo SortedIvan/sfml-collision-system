@@ -23,6 +23,8 @@ TransformComponent& EntitySystem::addTransformComponent(EcsDb& db, uint64_t enti
     TransformComponent& component = db.transformComponents.back();
     component.entity_id = entityID;
     component.isActive = true;
+    component.transform_id = transformIdCounter;
+    transformIdCounter++;
     return component;
 }
 

@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include "SFML/Graphics.hpp"
+#include <string>
 
 struct QuadRect
 {
@@ -34,7 +35,8 @@ struct QuadNode
 
     void split();
     void insert(QuadLeaf element);
+    void update(sf::Vector2f oldPos, sf::Vector2f newPos, uint64_t transformId, const std::unique_ptr<QuadNode>& root);
 };
 
 void visualizeTree(std::unique_ptr<QuadNode>& root, sf::RenderWindow& window);
-void traverseQuadTree(std::unique_ptr<QuadNode>& root);
+void traverseQuadTree(std::unique_ptr<QuadNode>& root, std::string wentTo);

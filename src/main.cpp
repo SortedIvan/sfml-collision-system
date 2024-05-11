@@ -57,11 +57,11 @@ int main()
     boundary.construct(0, 0, 1000, 800);
     root.get()->boundary = boundary;
 
-    traverseQuadTree(root);
-
-    spawnRandomEntities(100, ecsDb, entitySystem, (sf::Vector2f)window.getSize());
+    spawnRandomEntities(10, ecsDb, entitySystem, (sf::Vector2f)window.getSize());
 
     insertAllRectsIntoQuadTreeTest(root, ecsDb);
+
+    traverseQuadTree(root, "root");
 
     // Main loop
     while (window.isOpen())
