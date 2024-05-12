@@ -9,6 +9,7 @@
 #include "ecs_systems/click_system.hpp"
 #include "ecs_systems/follow_system.hpp"
 #include "ecs_systems/scatter_system.hpp"
+#include "utils/globals.hpp"
 
 // TEST ONLY
 #include <Windows.h>
@@ -20,9 +21,6 @@ void TryLoadFont(sf::Font& font, std::string path);
 sf::Vector2f randomDirVec();
 void insertAllRectsIntoQuadTreeTest(std::unique_ptr<QuadNode>& root, EcsDb& db);
 void addEntity(EcsDb& db, EntitySystem& entitySys, sf::RenderWindow& window, std::unique_ptr<QuadNode>& root);
-
-const int WIDTH_RECT = 20.f;
-const int HEIGHT_RECT = 20.f;
 
 int main()
 {
@@ -54,6 +52,7 @@ int main()
     ClickSystem clickSystem;
     FollowSystem followSystem;
     ScatterSystem scatterSystem;
+    CollisionSystem collisionSystem;
     
     std::unique_ptr<QuadNode> root = std::make_unique<QuadNode>();
     QuadRect boundary;
@@ -69,7 +68,6 @@ int main()
     // Main loop
     while (window.isOpen())
     {
-
         while (window.pollEvent(e))
         {
             if (e.type == sf::Event::Closed)
@@ -127,8 +125,8 @@ int main()
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
         transformSystem.moveAllComponents(ecsDb, deltaTime.asSeconds(), 1000, 800);
         shapeSystem.moveShapesIfNeeded(ecsDb);
-
         followSystem.setFollowTarget(ecsDb, (sf::Vector2f)mousePos);
+        collisionSystem.handleCollisions(ecsDb, root);
 
         root.reset();
         root = std::make_unique<QuadNode>();

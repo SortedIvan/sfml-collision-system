@@ -17,7 +17,7 @@ struct EcsDb
 	std::vector<FollowMousePosComponent> followMouseComponents;
 
 	// TODO: Rework this, leave for testing purposes
-	std::map<uint64_t, ShapeComponent> shapeComponentMapper;
+	std::map<uint64_t, int> shapeComponentMapper;
 
 	// ============== Entities ========================
 	std::vector<uint64_t> entities;

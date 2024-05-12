@@ -37,7 +37,7 @@ struct QuadNode
 
     int nodeCapacity = 4;
     QuadRect boundary;
-    std::vector<QuadLeaf> points;
+    std::vector<QuadLeaf> leaves;
     bool hasBeenSplit = false;
 
     void split();
@@ -49,4 +49,4 @@ struct QuadNode
 void visualizeTree(std::unique_ptr<QuadNode>& root, sf::RenderWindow& window);
 void traverseQuadTree(std::unique_ptr<QuadNode>& root, std::string wentTo, int level);
 void remove(std::unique_ptr<QuadNode>& parent, QuadNode* child);
-void queryRectCollision(const QuadRect& rect, std::unique_ptr<QuadNode>& root, std::map<uint64_t, int>& alreadyChecked);
+void queryRectCollision(const QuadRect& rect, const uint64_t toCompareWith, std::unique_ptr<QuadNode>& root, std::vector<QuadLeaf>& toCheck, std::map<uint64_t, int>& alreadyChecked);

@@ -40,6 +40,7 @@ ShapeComponent& EntitySystem::addShapeComponent(EcsDb& db, uint64_t entityID)
     db.shapeComponents.emplace_back();
     ShapeComponent& component = db.shapeComponents.back();
     component.shape_id = shapeIdCounter;
+    db.shapeComponentMapper.insert({ component.shape_id, db.shapeComponents.size() - 1});
     shapeIdCounter++;
     component.entity_id = entityID;
     component.isActive = true;

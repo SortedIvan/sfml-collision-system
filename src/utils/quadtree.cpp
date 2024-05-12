@@ -49,9 +49,9 @@ void QuadNode::insert(QuadLeaf element)
         return;
     }
 
-    if (points.size() < nodeCapacity && !hasBeenSplit)
+    if (leaves.size() < nodeCapacity && !hasBeenSplit)
     {
-        points.push_back(element);
+        leaves.push_back(element);
     }
     else
     {
@@ -60,8 +60,8 @@ void QuadNode::insert(QuadLeaf element)
             // If the current node hasn't been split, split it first
             split();
 
-            // Redistribute existing points to child nodes
-            for (const auto& p : points)
+            // Redistribute existing leaves to child nodes
+            for (const auto& p : leaves)
             {
                 TL->insert(p);
                 TR->insert(p);
@@ -69,7 +69,7 @@ void QuadNode::insert(QuadLeaf element)
                 BR->insert(p);
             }
 
-            points.clear();
+            leaves.clear();
         }
 
         // Then insert the new point into the appropriate child node
@@ -94,9 +94,9 @@ void QuadNode::update(sf::Vector2f oldPos, sf::Vector2f newPos, uint64_t shape_i
     {
         int pointIndex = -1;
 
-        for (int i = 0; i < points.size(); i++) 
+        for (int i = 0; i < leaves.size(); i++) 
         {
-            if (points[i].shape_id == shape_id)
+            if (leaves[i].shape_id == shape_id)
             {
                 // we found the point
                 pointIndex = i;
@@ -115,14 +115,14 @@ void QuadNode::update(sf::Vector2f oldPos, sf::Vector2f newPos, uint64_t shape_i
             return;
         }
 
-        this->points.erase(this->points.begin() + pointIndex);
+        this->leaves.erase(this->leaves.begin() + pointIndex);
 
-        if (points.empty())
+        if (leaves.empty())
         {
             remove(prev, this);
         }
 
-        QuadLeaf& leaf = points[pointIndex];
+        QuadLeaf& leaf = leaves[pointIndex];
         leaf.position = newPos;
 
         // Reinsert the point starting from the root
@@ -169,9 +169,9 @@ void traverseQuadTree(std::unique_ptr<QuadNode>& root, std::string wentTo, int l
     
     std::cout << spacing << wentTo << std::endl;
 
-    for (int i = 0; i < root.get()->points.size(); ++i)
+    for (int i = 0; i < root.get()->leaves.size(); ++i)
     {
-        std::cout << spacing << "  " << "(" << root.get()->points[i].position.x << ", " << root.get()->points[i].position.y << ")" << std::endl;
+        std::cout << spacing << "  " << "(" << root.get()->leaves[i].position.x << ", " << root.get()->leaves[i].position.y << ")" << std::endl;
     }
 
     level++;
@@ -211,7 +211,7 @@ void remove(std::unique_ptr<QuadNode>& parent, QuadNode* child)
     This means we have to check collision redundantly
     For some memory tradeoff, we can have a map to reduce this
 */
-void queryRectCollision(const QuadRect& rect, std::unique_ptr<QuadNode>& root, std::vector<QuadNode>& toCheck, std::map<uint64_t, int>& alreadyChecked)
+void queryRectCollision(const QuadRect& rect,const uint64_t toCompareWith, std::unique_ptr<QuadNode>& root, std::vector<QuadLeaf>& toCheck, std::map<uint64_t, int>& alreadyChecked)
 {
     if (!root->boundary.containsPoint(rect.x, rect.y) &&
         !root->boundary.containsPoint(rect.x + rect.w, rect.y) &&
@@ -228,9 +228,29 @@ void queryRectCollision(const QuadRect& rect, std::unique_ptr<QuadNode>& root, s
     if (root->hasBeenSplit)
     {
         // go deeper
+        queryRectCollision(rect, toCompareWith, root->TL, toCheck, alreadyChecked);
+        queryRectCollision(rect, toCompareWith, root->TR, toCheck, alreadyChecked);
+        queryRectCollision(rect, toCompareWith, root->BL, toCheck, alreadyChecked);
+        queryRectCollision(rect, toCompareWith, root->BR, toCheck, alreadyChecked);
     }
     else
     {
         // otherwise, we are in the correct segment, as deep as possible
+
+        for (int i = 0; i < root->leaves.size(); i++)
+        {
+            if (root->leaves[i].shape_id == toCompareWith)
+            {
+                continue;
+            }
+
+            if (alreadyChecked.find(root->leaves[i].shape_id) != alreadyChecked.end())
+            {
+                continue;
+            }
+
+            toCheck.push_back(root->leaves[i]);
+            alreadyChecked.insert({ root->leaves[i].shape_id, 1 });
+        }
     }
 }

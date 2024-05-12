@@ -148,6 +148,7 @@
     <ClCompile Include="src\ecs_systems\shape_system.cpp" />
     <ClCompile Include="src\ecs_systems\transform_system.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\utils\math.cpp" />
     <ClCompile Include="src\utils\quadtree.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +161,7 @@
     <ClInclude Include="src\ecs_systems\scatter_system.hpp" />
     <ClInclude Include="src\ecs_systems\shape_system.hpp" />
     <ClInclude Include="src\ecs_systems\transform_system.hpp" />
+    <ClInclude Include="src\utils\globals.hpp" />
     <ClInclude Include="src\utils\math.hpp" />
     <ClInclude Include="src\utils\quadtree.hpp" />
   </ItemGroup>

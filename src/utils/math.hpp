@@ -1,34 +1,13 @@
 #pragma once
 #include "SFML/Graphics.hpp"
 #include <random>
+#include <vector>
 
-float vectorLength(const sf::Vector2f vec)
-{
-	return std::sqrt(vec.x * vec.x + vec.y * vec.y);
-}
-
-bool checkIfPointInCircle(sf::Vector2f circleCenter, float radius, sf::Vector2f point)
-{
-	float lhs = (point.x - circleCenter.x) * (point.x - circleCenter.x)
-		+ (point.y - circleCenter.y) * (point.y - circleCenter.y);
-
-	if (lhs <= radius * radius)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-sf::Vector2f randomVelocity(int scalar)
-{
-	const double PI = 3.1415926;
-
-	std::random_device dev;
-	std::mt19937 rng(dev());
-
-	std::uniform_int_distribution<std::mt19937::result_type> dist6(0, 360);
-	return sf::Vector2f(std::cos(dist6(rng)) * (PI / 180) * scalar, std::sin(dist6(rng)) * (PI / 180) * scalar);
-}
-
-
+float veclen(const sf::Vector2f vec);
+bool checkIfPointInCirc(sf::Vector2f circleCenter, float radius, sf::Vector2f point);
+sf::Vector2f randomVelocity(int scalar);
+void calculateNormalsOfRectEdges(sf::VertexArray& rect, std::vector<sf::Vector2f>& output);
+sf::Vector2f normal2(sf::Vector2f a);
+float len2(sf::Vector2f a);
+float dot2(sf::Vector2f a, sf::Vector2f b);
+sf::Vector2f getMinMaxProjectionFromVertices(sf::Vector2f axis, sf::VertexArray vertices);
