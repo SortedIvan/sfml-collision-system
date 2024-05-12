@@ -8,5 +8,5 @@
 class TransformSystem
 {
 	public:
-		void moveAllComponents(EcsDb& db, float deltaTime, float screenWidth, float screenHeight, std::unique_ptr<QuadNode>& root);
+		void moveAllComponents(EcsDb& db, float deltaTime, float screenWidth, float screenHeight);
 };

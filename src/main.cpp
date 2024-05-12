@@ -10,6 +10,9 @@
 #include "ecs_systems/follow_system.hpp"
 #include "ecs_systems/scatter_system.hpp"
 
+// TEST ONLY
+#include <Windows.h>
+
 sf::Vector2f randomPointGenerator(sf::Vector2f range);
 void randomVelocityGenerator(std::vector<sf::Vector2f>& randomDirections, int scalar, int amountOfRects);
 void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vector2f windowDimensions);
@@ -17,6 +20,9 @@ void TryLoadFont(sf::Font& font, std::string path);
 sf::Vector2f randomDirVec();
 void insertAllRectsIntoQuadTreeTest(std::unique_ptr<QuadNode>& root, EcsDb& db);
 void addEntity(EcsDb& db, EntitySystem& entitySys, sf::RenderWindow& window, std::unique_ptr<QuadNode>& root);
+
+const int WIDTH_RECT = 20.f;
+const int HEIGHT_RECT = 20.f;
 
 int main()
 {
@@ -39,12 +45,9 @@ int main()
     fpsCounter.setPosition(50.f, 50.f);
     fpsCounter.setCharacterSize(20.f);
 
-    sf::Shader shader;
-
-
     EcsDb ecsDb;
 
-    // ========= ECS SYSTEMS ==================
+    // ============ ECS SYSTEMS ==================
     EntitySystem entitySystem;
     TransformSystem transformSystem;
     ShapeSystem shapeSystem;
@@ -61,7 +64,7 @@ int main()
 
     insertAllRectsIntoQuadTreeTest(root, ecsDb);
 
-    traverseQuadTree(root, "root");
+    traverseQuadTree(root, "root", 0);
 
     // Main loop
     while (window.isOpen())
@@ -99,6 +102,20 @@ int main()
                 {
                     addEntity(ecsDb, entitySystem, window, root);
                 }
+
+                if (e.key.code == sf::Keyboard::Q)
+                {
+                    system("cls");
+                    traverseQuadTree(root, "root", 0);
+                }
+            }
+
+            if (e.type == sf::Event::KeyPressed)
+            {
+                if (e.key.code == sf::Keyboard::R)
+                {
+
+                }
             }
         }
 
@@ -108,10 +125,15 @@ int main()
         
         // ========== Update ==============
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        transformSystem.moveAllComponents(ecsDb, deltaTime.asSeconds(), 1000, 800, root);
+        transformSystem.moveAllComponents(ecsDb, deltaTime.asSeconds(), 1000, 800);
         shapeSystem.moveShapesIfNeeded(ecsDb);
-        
+
         followSystem.setFollowTarget(ecsDb, (sf::Vector2f)mousePos);
+
+        root.reset();
+        root = std::make_unique<QuadNode>();
+        root.get()->boundary = boundary;
+        insertAllRectsIntoQuadTreeTest(root, ecsDb);
 
 
         // Clear the window
@@ -121,7 +143,6 @@ int main()
         visualizeTree(root, window);
         shapeSystem.drawShapes(ecsDb, window);
         window.draw(fpsCounter);
-
 
         // display
         window.display();
@@ -140,13 +161,15 @@ int main()
     return 0;
 }
 
+// 
 void insertAllRectsIntoQuadTreeTest(std::unique_ptr<QuadNode>& root, EcsDb& db)
 {
-    for (int i = 0; i < db.transformComponents.size(); i++)
+    for (int i = 0; i < db.shapeComponents.size(); i++)
     {
         QuadLeaf leaf;
-        leaf.position = db.transformComponents[i].position;
-        leaf.transformId = db.transformComponents[i].transform_id;
+        leaf.position = db.shapeComponents[i].shape[0].position;
+        leaf.size = sf::Vector2f(WIDTH_RECT, HEIGHT_RECT);
+        leaf.shape_id = db.shapeComponents[i].shape_id;
 
         root.get()->insert(leaf);
     }
@@ -184,8 +207,6 @@ sf::Vector2f randomPointGenerator(sf::Vector2f range)
 
 void addEntity(EcsDb& db, EntitySystem& entitySys, sf::RenderWindow& window, std::unique_ptr<QuadNode>& root)
 {
-    int widthRect = 15.f;
-    int heightRect = 15.f;
     sf::Vector2f positionClicked = (sf::Vector2f)sf::Mouse::getPosition(window);
 
     uint64_t entity = entitySys.createEntity(db);
@@ -197,12 +218,12 @@ void addEntity(EcsDb& db, EntitySystem& entitySys, sf::RenderWindow& window, std
 
     shape.shape = sf::VertexArray(sf::Quads, 4);
 
-    shape.shape[0].position = sf::Vector2f(positionClicked.x - widthRect / 2, positionClicked.y - heightRect / 2);
-    shape.shape[1].position = sf::Vector2f(positionClicked.x + widthRect / 2, positionClicked.y - heightRect / 2);
-    shape.shape[2].position = sf::Vector2f(positionClicked.x + widthRect / 2, positionClicked.y + heightRect / 2);
-    shape.shape[3].position = sf::Vector2f(positionClicked.x - widthRect / 2, positionClicked.y + heightRect / 2);
+    shape.shape[0].position = sf::Vector2f(positionClicked.x - WIDTH_RECT / 2, positionClicked.y - HEIGHT_RECT / 2);
+    shape.shape[1].position = sf::Vector2f(positionClicked.x + WIDTH_RECT / 2, positionClicked.y - HEIGHT_RECT / 2);
+    shape.shape[2].position = sf::Vector2f(positionClicked.x + WIDTH_RECT / 2, positionClicked.y + HEIGHT_RECT / 2);
+    shape.shape[3].position = sf::Vector2f(positionClicked.x - WIDTH_RECT / 2, positionClicked.y + HEIGHT_RECT / 2);
 
-    shape.shape[0].color = sf::Color::Blue;
+    shape.shape[0].color = sf::Color::Yellow;
     shape.shape[1].color = sf::Color::Blue;
     shape.shape[2].color = sf::Color::Blue;
     shape.shape[3].color = sf::Color::Blue;
@@ -215,17 +236,15 @@ void addEntity(EcsDb& db, EntitySystem& entitySys, sf::RenderWindow& window, std
     transform.isMoving = true;
 
     QuadLeaf leaf; 
-    leaf.position = transform.position;
-    leaf.transformId = transform.transform_id;
+    leaf.position = shape.shape[0].position;
+    leaf.size = sf::Vector2f(WIDTH_RECT, HEIGHT_RECT);
+    leaf.shape_id = shape.shape_id;
 
     root.get()->insert(leaf);
 }
 
 void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vector2f windowDimensions)
 {
-
-    int widthRect = 15.f;
-    int heightRect = 15.f;
 
     //std::vector<sf::Vector2f> randomDirections;
     //randomVelocityGenerator(randomDirections, 5.f, amount);
@@ -237,6 +256,8 @@ void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vec
         ClickableComponent& click = entitySys.addClickableComponent(db, entity);
         ShapeComponent& shape = entitySys.addShapeComponent(db, entity);
         TransformComponent& transform = entitySys.addTransformComponent(db, entity);
+        ColliderComponent& collider = entitySys.addColliderComponent(db, entity);
+
         entitySys.addFollowMouseComponent(db, entity);
 
         shape.shape = sf::VertexArray(sf::Quads, 4);
@@ -244,12 +265,12 @@ void spawnRandomEntities(int amount, EcsDb& db, EntitySystem& entitySys, sf::Vec
         // Generate a random point within the screen
         sf::Vector2f point = randomPointGenerator(windowDimensions);
 
-        shape.shape[0].position = sf::Vector2f(point.x - widthRect / 2, point.y - heightRect / 2);
-        shape.shape[1].position = sf::Vector2f(point.x + widthRect / 2, point.y - heightRect / 2);
-        shape.shape[2].position = sf::Vector2f(point.x + widthRect / 2, point.y + heightRect / 2);
-        shape.shape[3].position = sf::Vector2f(point.x - widthRect / 2, point.y + heightRect / 2);
+        shape.shape[0].position = sf::Vector2f(point.x - WIDTH_RECT / 2, point.y - HEIGHT_RECT / 2);
+        shape.shape[1].position = sf::Vector2f(point.x + WIDTH_RECT / 2, point.y - HEIGHT_RECT / 2);
+        shape.shape[2].position = sf::Vector2f(point.x + WIDTH_RECT / 2, point.y + HEIGHT_RECT / 2);
+        shape.shape[3].position = sf::Vector2f(point.x - WIDTH_RECT / 2, point.y + HEIGHT_RECT / 2);
 
-        shape.shape[0].color = sf::Color::Blue;
+        shape.shape[0].color = sf::Color::Yellow;
         shape.shape[1].color = sf::Color::Blue;
         shape.shape[2].color = sf::Color::Blue;
         shape.shape[3].color = sf::Color::Blue;

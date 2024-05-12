@@ -18,7 +18,7 @@ sf::Color genRandomColor()
     return sf::Color(red, green, blue);
 }
 
-void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screenWidth, float screenHeight, std::unique_ptr<QuadNode>& root)
+void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screenWidth, float screenHeight)
 {
     for (auto& transform : db.transformComponents)
     {
@@ -36,32 +36,6 @@ void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screen
 
             // Update position based on velocity
             transform.position += transform.velocity * deltaTime;
-            
-            /*
-                Use the previousPosition to query the tree.
-                Then, use the newPosition to update the point
-            */
-
-            if (root->TL)
-            {
-                root->TL->update(transform.previousPosition, transform.position, transform.transform_id, root);
-            }
-
-            if (root->TR)
-            {
-                root->TR->update(transform.previousPosition, transform.position, transform.transform_id, root);
-            }
-
-            if (root->BL)
-            {
-                root->BL->update(transform.previousPosition, transform.position, transform.transform_id, root);
-            }
-
-            if (root->BR)
-            {
-                root->BR->update(transform.previousPosition, transform.position, transform.transform_id, root);
-            }
-
 
             // Apply damping to velocity
             transform.velocity.x -= transform.velocity.x * transform.dampingFactor * deltaTime;
@@ -127,3 +101,30 @@ void TransformSystem::moveAllComponents(EcsDb& db, float deltaTime, float screen
         }
     }
 }
+
+
+
+/*
+    Use the previousPosition to query the tree.
+    Then, use the newPosition to update the point
+*/
+
+/* if (root->TL)
+ {
+     root->TL->update(transform.previousPosition, transform.position, transform.transform_id, root->TL,root);
+ }
+
+ if (root->TR)
+ {
+     root->TR->update(transform.previousPosition, transform.position, transform.transform_id, root->TR,root);
+ }
+
+ if (root->BL)
+ {
+     root->BL->update(transform.previousPosition, transform.position, transform.transform_id, root->BL,root);
+ }
+
+ if (root->BR)
+ {
+     root->BR->update(transform.previousPosition, transform.position, transform.transform_id, root->BR, root);
+ }*/

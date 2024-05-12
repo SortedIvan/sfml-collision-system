@@ -1,5 +1,6 @@
 #include "quadtree.hpp"
 
+
 void QuadRect::construct(float x, float y, float w, float h)
 {
     this->x = x;
@@ -8,14 +9,16 @@ void QuadRect::construct(float x, float y, float w, float h)
     this->h = h;
 }
 
-bool QuadRect::contains(float _x, float _y)
+bool QuadRect::containsPoint(float _x, float _y)
 {
     if (x <= _x && y <= _y && (x + w) >= _x && (y + h) >= _y)
     {
         return true;
     }
+
     return false;
 }
+
 
 void QuadNode::split() 
 {
@@ -32,12 +35,17 @@ void QuadNode::split()
     BR->boundary.construct(boundary.x + boundary.w / 2, boundary.y + boundary.h / 2, boundary.w / 2, boundary.h / 2);
 }
 
-
+/*
+    For testing purposes, insert the leaf in all boundaries that contain the rectangle
+*/ 
 void QuadNode::insert(QuadLeaf element)
 {
-    if (!boundary.contains(element.position.x, element.position.y))
-    {
-        // this is not the correct quadrant
+    
+    if (!boundary.containsPoint(element.position.x, element.position.y) &&
+        !boundary.containsPoint(element.position.x + element.size.x, element.position.y) &&
+        !boundary.containsPoint(element.position.x + element.size.x, element.position.y + element.size.y) &&
+        !boundary.containsPoint(element.position.x, element.position.y + element.size.y)) {
+        // Element does not intersect with this node's boundary, so we cannot insert it here
         return;
     }
 
@@ -71,89 +79,24 @@ void QuadNode::insert(QuadLeaf element)
         BR->insert(element);
     }
 }
-//
-//void QuadNode::update(sf::Vector2f oldPos, sf::Vector2f newPos, uint64_t transformId, std::unique_ptr<QuadNode>& root)
-//{
-//    if (!boundary.contains(oldPos.x, oldPos.y))
-//    {
-//        // this is not the correct quadrant
-//
-//        if (TL)
-//        {
-//            TL->update(oldPos, newPos, transformId, root);
-//        }
-//
-//        if (TR)
-//        {
-//            TR->update(oldPos, newPos, transformId, root);
-//        }
-//
-//        if (BL)
-//        {
-//            BL->update(oldPos, newPos, transformId, root);
-//        }
-//
-//        if (BR)
-//        {
-//            BR->update(oldPos, newPos, transformId, root);
-//        }
-//    }
-//    else
-//    {   
-//        int pointIndex = -1;
-//        for (int i = 0; i < this->points.size(); i++)
-//        {
-//            if (this->points[i].transformId == transformId)
-//            {
-//                // we found the point
-//                pointIndex = i;
-//                break;
-//            }
-//        }
-//
-//        if (!pointIndex)
-//        {
-//            return;
-//        }
-//
-//        // check if point contained in the same boundary so we don't need to move it
-//        if (boundary.contains(newPos.x, newPos.y))
-//        {
-//            return;
-//        }
-//
-//        QuadLeaf leaf = points[pointIndex]; 
-//        leaf.position = newPos;
-//
-//        this->points.erase(this->points.begin() + pointIndex);
-//
-//        // Reinsert the point starting from the root
-//        root->insert(leaf);
-//
-//        if (this->points.size() == 0 && !TL && !TR && !BL && !BR)
-//        {
-//            delete this;
-//        }
-//    }
-//}
 
-void QuadNode::update(sf::Vector2f oldPos, sf::Vector2f newPos, uint64_t transformId, const std::unique_ptr<QuadNode>& root) 
+void QuadNode::update(sf::Vector2f oldPos, sf::Vector2f newPos, uint64_t shape_id,std::unique_ptr<QuadNode>& prev, std::unique_ptr<QuadNode>& root)
 {
-    if (!boundary.contains(oldPos.x, oldPos.y)) 
+    if (!boundary.containsPoint(oldPos.x, oldPos.y))
     {
         // this is not the correct quadrant
-        if (TL) TL->update(oldPos, newPos, transformId, root);
-        if (TR) TR->update(oldPos, newPos, transformId, root);
-        if (BL) BL->update(oldPos, newPos, transformId, root);
-        if (BR) BR->update(oldPos, newPos, transformId, root);
-
+        if (TL) TL->update(oldPos, newPos, shape_id, TL, root);
+        if (TR) TR->update(oldPos, newPos, shape_id, TR, root);
+        if (BL) BL->update(oldPos, newPos, shape_id, BL, root);
+        if (BR) BR->update(oldPos, newPos, shape_id, BR, root);
     }
     else
     {
         int pointIndex = -1;
+
         for (int i = 0; i < points.size(); i++) 
         {
-            if (points[i].transformId == transformId) 
+            if (points[i].shape_id == shape_id)
             {
                 // we found the point
                 pointIndex = i;
@@ -165,11 +108,18 @@ void QuadNode::update(sf::Vector2f oldPos, sf::Vector2f newPos, uint64_t transfo
         {
             return;
         }
-
+        
         // check if point contained in the same boundary so we don't need to move it
-        if (boundary.contains(newPos.x, newPos.y)) 
+        if (this->boundary.containsPoint(newPos.x, newPos.y))
         {
             return;
+        }
+
+        this->points.erase(this->points.begin() + pointIndex);
+
+        if (points.empty())
+        {
+            remove(prev, this);
         }
 
         QuadLeaf& leaf = points[pointIndex];
@@ -177,14 +127,6 @@ void QuadNode::update(sf::Vector2f oldPos, sf::Vector2f newPos, uint64_t transfo
 
         // Reinsert the point starting from the root
         root->insert(leaf);
-
-        points.erase(points.begin() + pointIndex);
-
-        if (points.size() == 0 && !TL && !TR && !BL && !BR) 
-        {
-            // no points and no children, can delete this node
-            // it's managed by smart pointers
-        }
     }
 }
 
@@ -205,28 +147,62 @@ void visualizeTree(std::unique_ptr<QuadNode>& root, sf::RenderWindow& window)
 
     window.draw(rect);
 
-    visualizeTree(root.get()->TL, window);
-    visualizeTree(root.get()->TR, window);
-    visualizeTree(root.get()->BL, window);
-    visualizeTree(root.get()->BR, window);
+    visualizeTree(root->TL, window);
+    visualizeTree(root->TR, window);
+    visualizeTree(root->BL, window);
+    visualizeTree(root->BR, window);
 }
 
-void traverseQuadTree(std::unique_ptr<QuadNode>& root, std::string wentTo)
+void traverseQuadTree(std::unique_ptr<QuadNode>& root, std::string wentTo, int level)
 {
     if (!root)
     {
         return;
     }
 
-    std::cout << wentTo << std::endl;
+    std::string spacing = "";
 
-    for (int i = 0; i < root.get()->points.size(); i++)
+    for (int i = 0; i < level; i++)
     {
-        std::cout << "(" << root.get()->points[i].position.x << ", " << root.get()->points[i].position.y << ")" << std::endl;
+        spacing += "  ";
+    }
+    
+    std::cout << spacing << wentTo << std::endl;
+
+    for (int i = 0; i < root.get()->points.size(); ++i)
+    {
+        std::cout << spacing << "  " << "(" << root.get()->points[i].position.x << ", " << root.get()->points[i].position.y << ")" << std::endl;
     }
 
-    traverseQuadTree(root->TL, "TL");
-    traverseQuadTree(root->TR, "TR");
-    traverseQuadTree(root->BL, "BL");
-    traverseQuadTree(root->BR, "BR");
+    level++;
+
+    traverseQuadTree(root->TL, "TL", level);
+    traverseQuadTree(root->TR, "TR", level);
+    traverseQuadTree(root->BL, "BL", level);
+    traverseQuadTree(root->BR, "BR", level);
+}
+
+void remove(std::unique_ptr<QuadNode>& parent, QuadNode* child) 
+{
+    if (!parent) {
+        return; // Parent doesn't exist
+    }
+
+    std::cout << "nigger" << std::endl;
+
+    if (parent->TL.get() == child) {
+        parent->TL.reset(); // Reset the unique pointer, removing the child
+    }
+    else if (parent->TR.get() == child) 
+    {
+        parent->TR.reset();
+    }
+    else if (parent->BL.get() == child) 
+    {
+        parent->BL.reset();
+    }
+    else if (parent->BR.get() == child) 
+    {
+        parent->BR.reset();
+    }
 }

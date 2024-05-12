@@ -2,20 +2,7 @@
 
 void CollisionSystem::handleCollisions(EcsDb& db) 
 {
-    for (auto& collider : db.colliderComponents) 
-    {
-        if (!collider.isActive) continue;
-
-        for (auto& other : db.colliderComponents) 
-        {
-            if (!other.isActive || collider.entity_id == other.entity_id) continue;
-
-            if (simpleCollisionCheck(collider, other)) 
-            {
-                resolveCollision(collider, other, db);
-            }
-        }
-    }
+    //for (int i = 0; i < )
 }
 
 bool CollisionSystem::simpleCollisionCheck(const ColliderComponent& a, const ColliderComponent& b) {

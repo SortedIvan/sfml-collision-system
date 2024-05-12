@@ -5,6 +5,7 @@
 #pragma once
 #include <vector>
 #include "../ecs_components/components.hpp"
+#include <map>
 
 struct EcsDb
 {
@@ -14,6 +15,9 @@ struct EcsDb
 	std::vector<ColliderComponent> colliderComponents;
 	std::vector<ClickableComponent> clickableComponents;
 	std::vector<FollowMousePosComponent> followMouseComponents;
+
+	// TODO: Rework this, leave for testing purposes
+	std::map<uint64_t, ShapeComponent> shapeComponentMapper;
 
 	// ============== Entities ========================
 	std::vector<uint64_t> entities;

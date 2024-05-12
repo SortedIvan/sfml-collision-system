@@ -29,7 +29,6 @@ struct TransformComponent
     sf::Vector2f velocity;
     sf::Vector2f acceleration;
     uint64_t entity_id;
-    uint64_t transform_id; // used for identifying in quad tree
     float dampingFactor;
     bool isActive;
     bool isMoving = false;
@@ -40,6 +39,7 @@ struct ShapeComponent
 {
     sf::VertexArray shape;
     uint64_t entity_id;
+    uint64_t shape_id;
     bool isActive;
     bool positionHasChanged = false;
 };

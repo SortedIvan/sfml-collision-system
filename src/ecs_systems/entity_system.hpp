@@ -3,7 +3,7 @@
 class EntitySystem
 {
     private:
-        int transformIdCounter = 0;
+        int shapeIdCounter = 0;
     public:
         uint64_t createEntity(EcsDb& db);
         TransformComponent& addTransformComponent(EcsDb& db, uint64_t entityID);

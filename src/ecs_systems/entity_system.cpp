@@ -23,8 +23,6 @@ TransformComponent& EntitySystem::addTransformComponent(EcsDb& db, uint64_t enti
     TransformComponent& component = db.transformComponents.back();
     component.entity_id = entityID;
     component.isActive = true;
-    component.transform_id = transformIdCounter;
-    transformIdCounter++;
     return component;
 }
 
@@ -41,6 +39,8 @@ ShapeComponent& EntitySystem::addShapeComponent(EcsDb& db, uint64_t entityID)
 {
     db.shapeComponents.emplace_back();
     ShapeComponent& component = db.shapeComponents.back();
+    component.shape_id = shapeIdCounter;
+    shapeIdCounter++;
     component.entity_id = entityID;
     component.isActive = true;
     return component;
