@@ -3,6 +3,8 @@
 #include <iostream>
 #include "SFML/Graphics.hpp"
 #include <string>
+#include <map>
+#include <stdint.h>
 
 struct QuadRect
 {
@@ -47,4 +49,4 @@ struct QuadNode
 void visualizeTree(std::unique_ptr<QuadNode>& root, sf::RenderWindow& window);
 void traverseQuadTree(std::unique_ptr<QuadNode>& root, std::string wentTo, int level);
 void remove(std::unique_ptr<QuadNode>& parent, QuadNode* child);
-void queryRectangle(const QuadRect& rect, std::unique_ptr<QuadNode>& root);
+void queryRectCollision(const QuadRect& rect, std::unique_ptr<QuadNode>& root, std::map<uint64_t, int>& alreadyChecked);

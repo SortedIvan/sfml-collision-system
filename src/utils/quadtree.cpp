@@ -188,8 +188,6 @@ void remove(std::unique_ptr<QuadNode>& parent, QuadNode* child)
         return; // Parent doesn't exist
     }
 
-    std::cout << "nigger" << std::endl;
-
     if (parent->TL.get() == child) {
         parent->TL.reset(); // Reset the unique pointer, removing the child
     }
@@ -204,5 +202,35 @@ void remove(std::unique_ptr<QuadNode>& parent, QuadNode* child)
     else if (parent->BR.get() == child) 
     {
         parent->BR.reset();
+    }
+}
+
+/*
+    Fetches all of the potential colliders
+    Could be duplicates, would still have to check them
+    This means we have to check collision redundantly
+    For some memory tradeoff, we can have a map to reduce this
+*/
+void queryRectCollision(const QuadRect& rect, std::unique_ptr<QuadNode>& root, std::vector<QuadNode>& toCheck, std::map<uint64_t, int>& alreadyChecked)
+{
+    if (!root->boundary.containsPoint(rect.x, rect.y) &&
+        !root->boundary.containsPoint(rect.x + rect.w, rect.y) &&
+        !root->boundary.containsPoint(rect.x + rect.w, rect.y + rect.h) &&
+        !root->boundary.containsPoint(rect.x, rect.y + rect.h)) 
+    {
+        // Element does not intersect with this node's boundary, so we stop querying
+        return;
+    }
+
+    // otherwise, we are in a correct segment
+    // However, we still need to crawl as deep as possible
+
+    if (root->hasBeenSplit)
+    {
+        // go deeper
+    }
+    else
+    {
+        // otherwise, we are in the correct segment, as deep as possible
     }
 }

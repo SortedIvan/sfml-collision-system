@@ -1,8 +1,13 @@
 #include "../ecs_systems/collision_system.hpp"
 
-void CollisionSystem::handleCollisions(EcsDb& db) 
+// TO DO: Have this run with collider components, don't touch shape components
+// this would require to update the collider positions every frame, not worth for simulation
+void CollisionSystem::handleCollisions(EcsDb& db, std::unique_ptr<QuadNode>& root) 
 {
-    //for (int i = 0; i < )
+    for (int i = 0; i < db.shapeComponents.size(); i++)
+    {
+        //root->
+    }
 }
 
 bool CollisionSystem::simpleCollisionCheck(const ColliderComponent& a, const ColliderComponent& b) {
